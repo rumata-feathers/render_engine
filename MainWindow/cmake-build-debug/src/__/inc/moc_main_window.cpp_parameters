@@ -1,0 +1,4 @@
+-I/Users/georgiikuznetsov/Desktop/coding/engine/MainWindow/inc
+-o
+/Users/georgiikuznetsov/Desktop/coding/engine/MainWindow/cmake-build-debug/src/__/inc/moc_main_window.cpp
+/Users/georgiikuznetsov/Desktop/coding/engine/MainWindow/inc/main_window.h

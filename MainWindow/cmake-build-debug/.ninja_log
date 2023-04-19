@@ -1,0 +1,6 @@
+# ninja log v5
+0	20	1681751188938049212	src/__/inc/moc_main_window.cpp	805252c0790eaca8
+0	20	1681751188938049212	/Users/georgiikuznetsov/Desktop/coding/engine/MainWindow/cmake-build-debug/src/__/inc/moc_main_window.cpp	805252c0790eaca8
+21	2518	1681751191422396904	src/CMakeFiles/MainWindow.dir/testing.cpp.o	f68d1dd0226defb9
+21	2534	1681751191439105226	src/CMakeFiles/MainWindow.dir/__/inc/moc_main_window.cpp.o	6fdf13af968f1db7
+21	2561	1681751191467869955	src/CMakeFiles/MainWindow.dir/main_window.cpp.o	d950ac82656d412d

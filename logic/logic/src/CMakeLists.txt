@@ -1,0 +1,12 @@
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(PROJECT_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/Scene.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/vector3.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/testing.cpp
+        )
+
+set(BACK_LOGIC_SRC ${PROJECT_SOURCES} CACHE INTERNAL "")
+
+add_executable(back_logic ${PROJECT_SOURCES})
