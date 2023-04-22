@@ -7,12 +7,12 @@
 
 
 // initial width and height of the main_window
-int MAIN_WINDOW_WIDTH = 720;
-int MAIN_WINDOW_HEIGHT = 480;
+int MAIN_WINDOW_WIDTH = 1280;
+int MAIN_WINDOW_HEIGHT = 720;
 
 // minimal width and height of the main_window
-int MAIN_WINDOW_MIN_WIDTH = 300;
-int MAIN_WINDOW_MIN_HEIGHT = 200;
+int MAIN_WINDOW_MIN_WIDTH = 720;
+int MAIN_WINDOW_MIN_HEIGHT = 480;
 
 // menubar sizes
 int MENUBAR_HEIGHT = 10;

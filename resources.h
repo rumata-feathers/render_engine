@@ -5,6 +5,6 @@
 #ifndef ENGINE__RESOURCES_H_
 #define ENGINE__RESOURCES_H_
 
-#include "src/interface.cpp"
+#include "logic/sources.h"
 
 #endif //ENGINE__RESOURCES_H_

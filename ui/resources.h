@@ -25,10 +25,10 @@
 #include <QPainter>
 #include <QtOpenGLWidgets/QtOpenGLWidgets>
 #include <QtGui>
-#include <QtOpenGL>
+//#include <QtOpenGL>
 #include <QOpenGLFunctions>
-#include <QOpenGLWindow>
-#include <QtOpenGLVersion>
+//#include <QOpenGLWindow>
+//#include <QtOpenGLVersion>
 #include <QtOpenGLWidgets/QtOpenGLWidgetsDepends>
 #include <QtOpenGLWidgets/QOpenGLWidget>
 
@@ -36,5 +36,5 @@
 #include <QtQuick/QQuickWindow>
 
 
-#include "../ext_resources.h"
+#include "../resources.h"
 #endif //MAINWINDOW_FRONT_MAINWINDOW_RESOURCES_H_

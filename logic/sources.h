@@ -5,7 +5,7 @@
 #ifndef ENGINE_LOGIC_SOURCES_H_
 #define ENGINE_LOGIC_SOURCES_H_
 
-//#include "src/logic.cpp"
+//#include "ui_src/logic.cpp"
 #include "inc/logic.h"
 
 #endif //ENGINE_LOGIC_SOURCES_H_

@@ -3,5 +3,13 @@
 //
 
 #include "../inc/Scene.h"
-Scene::Scene() = default;
+Scene::Scene() {
+  rend_samples = 128;
+}
+int Scene::get_render_samples() const{
+  return rend_samples;
+}
+camera Scene::get_camera() const {
+  return camera_;
+}
 Scene::~Scene() = default;

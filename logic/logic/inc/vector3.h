@@ -6,15 +6,16 @@
 #define ENGINE_LOGIC_VECTOR3_H_
 
 #include <vector>
+#include <QColor>
 
 template<typename T = double>
 class vector3 {
  public:
   vector3();
-  template<typename ...Args>
-  vector3(Args&& ... args);
-  vector3(std::initializer_list<T>);
-  vector3(const std::vector<T>& other);
+//  template<typename ...Args>
+//  vector3(Args&& ... args);
+  vector3(T a, T b, T c);
+  explicit vector3(const std::vector<T>& other);
   // K will cast to T
   template<typename K>
   vector3(const vector3<K>& other);
@@ -51,6 +52,9 @@ class vector3 {
 
   void normalize();
 
+  //conversion from vec3 to QColor
+  operator QColor();
+
   ~vector3();
  private:
   std::vector<T> list;
@@ -76,5 +80,13 @@ template<typename T>
 vector3<T> cross(const vector3<T>& u, const vector3<T>& v);
 template<typename T>
 vector3<T> unit_vector(vector3<T> v);
+
+template<typename T>
+vector3<vector3<T>> mat_mul(const vector3<vector3<T>>& mat1, const vector3<vector3<T>>& mat2);
+
+// Type aliases for vec3
+using point3 = vector3<double>;   // 3D point
+using vec3 = vector3<double>;   // 3D point
+using color = vector3<double>;    // RGB color
 
 #endif //ENGINE_LOGIC_VECTOR3_H_

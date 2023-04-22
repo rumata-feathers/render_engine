@@ -35,32 +35,30 @@ class MainWindow : public QMainWindow, protected QOpenGLFunctions {
   logic* logic_linker;
 };
 
-//class RenderWindow: public QWidget{
-//  Q_OBJECT
-// public:
-//  RenderWindow(logic* new_linker, QWidget *parent = nullptr);
-//  ~RenderWindow();
-//
-//  void wheelEvent (QWheelEvent* event);
-//
-//  void draw();
-//
-//  void set_lable();
-//
-// private:
-//  int current_sample = 0;
-//
-//  QPixmap* pixmap;
-//
-//  QGraphicsScene* scene;
-//  QGraphicsView* view;
-//  logic* logic_linker;
-//  QTimer* timer;
-//
-//  QLayout* layout;
-//  QToolBar* toolbar;
-//  QLabel* samples_lable;
-//  QPaintEngine* paint_engine;
-//  QPainter* painter;
-//};
+class RenderWindow: public QWidget{
+  Q_OBJECT
+ public:
+  explicit RenderWindow(logic* new_linker, QWidget *parent = nullptr);
+  ~RenderWindow() override;
+
+  void wheelEvent (QWheelEvent* event) override;
+
+  void draw();
+
+  void set_lable();
+
+ private:
+  int current_sample = 0;
+
+  QPixmap* pixmap;
+
+  QGraphicsScene* scene;
+  QGraphicsView* view;
+  logic* logic_linker;
+  QTimer* timer;
+
+  QLayout* layout;
+  QToolBar* toolbar;
+  QLabel* samples_lable;
+};
 #endif //ENGINE_FRONT_MAINWINDOW_H_

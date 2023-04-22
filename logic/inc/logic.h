@@ -11,10 +11,10 @@ class logic {
 
  public:
   logic();
-  QPixmap* get_pixmap() ;
+  QPixmap* get_pixmap();
   int get_samples();
   std::pair<int, int> get_camera_rect();
-    ~logic();
+  ~logic();
 
  private:
   Scene* cur_scene;

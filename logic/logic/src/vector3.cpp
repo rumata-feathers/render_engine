@@ -1,7 +1,3 @@
-//
-// Created by Георгий Кузнецов on 12.04.2023.
-//
-
 #include "../inc/vector3.h"
 #include <iostream>
 
@@ -19,23 +15,29 @@ vector3<T>::vector3(const std::vector<T>& other) {
     std::cerr << exception << std::endl;
   }
 }
+//
+// Created by Георгий Кузнецов on 12.04.2023.
+//template<typename T>
+//template<typename ...Args>
+//vector3<T>::vector3(Args&& ...args): list{std::forward<Args>(args)...} {
+//  try {
+//    if (list.size() != 3) {
+//      throw "Cannot build vector3 with these arguments";
+//    }
+//  }
+//  catch (const char* exception) {
+//    std::cerr << exception << std::endl;
+//  }
+template<typename T>
+vector3<T>::vector3(T a, T b, T c) {
+  list = std::vector<T>{a, b, c};
+}
+
 template<typename T>
 template<typename K>
 vector3<T>::vector3(const vector3<K>& other): list(other.list) {}
 
-template<typename T>
-template<typename ...Args>
-vector3<T>::vector3(Args&& ...args): list{std::forward<Args>(args)...} {
-  try {
-    if (list.size() != 3) {
-      throw "Cannot build vector3 with these arguments";
-    }
-  }
-  catch (const char* exception) {
-    std::cerr << exception << std::endl;
-  }
-}
-
+//}
 // now functions
 template<typename T>
 T& vector3<T>::x() {
@@ -81,11 +83,11 @@ template<typename T>
 T& vector3<T>::z_angle() {
   return list[2];
 }
+
 template<typename T>
 T vector3<T>::z_angle() const {
   return list[2];
 }
-
 template<typename T>
 vector3<T> vector3<T>::operator-() const {
   return vector3(-list[0], -list[1], -list[2]);
@@ -98,6 +100,7 @@ T vector3<T>::operator[](int i) const {
     throw std::out_of_range("Invalid iterator in vector3");
   }
 }
+
 template<typename T>
 T& vector3<T>::operator[](int i) {
   try {
@@ -106,7 +109,6 @@ T& vector3<T>::operator[](int i) {
     throw std::out_of_range("Invalid iterator in vector3");
   }
 }
-
 template<typename T>
 vector3<T>& vector3<T>::operator+=(const vector3& other) {
   list[0] += other.list[0];
@@ -165,7 +167,13 @@ void vector3<T>::invert() {
   *this = -(*this);
 }
 template<typename T>
-vector3<T>::vector3(std::initializer_list<T> initializer_list): list {initializer_list} {}
+vector3<T>::operator QColor() {
+  QColor color;
+  color.setRedF(x());
+  color.setBlueF(y());
+  color.setGreenF(z());
+  return color;
+}
 
 // external functions
 template<typename T>
@@ -192,7 +200,7 @@ vector3<T> operator*(const vector3<T>& u, const vector3<K>& v) {
 }
 template<typename T>
 vector3<T> operator*(T t, const vector3<T>& v) {
-  return vector3<T>(t * v.list[0], t * v.list[1], t * v.list[2]);
+  return vector3<T>(t * v[0], t * v[1], t * v[2]);
 }
 template<typename T>
 vector3<T> operator*(const vector3<T>& v, T t) {
@@ -217,6 +225,31 @@ vector3<T> unit_vector(vector3<T> v) {
   return v / v.length();
 }
 
-template class vector3<double>;
-template class vector3<int>;
+template<typename T>
+vector3<vector3<T>> mat_mul(const vector3<vector3<T>>& mat1, const vector3<vector3<T>>& mat2) {
+  int m = 3;
+  int n = 3;
+  int l = 3;
+
+
+
+  vector3<vector3<T>> result;
+
+  for (int i = 0; i < m; ++i) {
+    for (int j = 0; j < l; ++j) {
+      T res = 0;
+      for (int k = 0; k < n; ++k) {
+        res += mat1[i][k] * mat2[k][j];
+      }
+      result[i][j] = res;
+    }
+  }
+
+  return result;
+}
+
+template
+class vector3<double>;
+template
+class vector3<int>;
 
