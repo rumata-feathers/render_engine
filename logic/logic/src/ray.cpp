@@ -1,13 +1,7 @@
-//
-// Created by Георгий Кузнецов on 21.04.2023.
-//
-
 #include "../inc/ray.h"
 
 ray::ray() = default;
-ray::ray(const point3& origin, const vec3& direction) {
-
-}
+ray::ray(const point3& origin, const vec3& direction): orig(origin), dir(direction) {}
 vec3 ray::direction() const {
   return dir;
 }

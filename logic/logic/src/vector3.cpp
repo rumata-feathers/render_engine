@@ -170,8 +170,8 @@ template<typename T>
 vector3<T>::operator QColor() {
   QColor color;
   color.setRedF(x());
-  color.setBlueF(y());
-  color.setGreenF(z());
+  color.setGreenF(y());
+  color.setBlueF(z());
   return color;
 }
 

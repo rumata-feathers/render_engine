@@ -4,7 +4,7 @@
 
 #include "../inc/Scene.h"
 Scene::Scene() {
-  rend_samples = 128;
+  rend_samples = 1;
 }
 int Scene::get_render_samples() const{
   return rend_samples;

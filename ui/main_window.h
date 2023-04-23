@@ -47,6 +47,10 @@ class RenderWindow: public QWidget{
 
   void set_lable();
 
+// protected slots:
+//  void zoom_in();
+//  void zoom_out();
+
  private:
   int current_sample = 0;
 

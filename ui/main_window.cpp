@@ -4,9 +4,10 @@
 #include "main_window.h"
 #include "ui_main_window.h"
 
-#include <iostream>
 #include <string>
 #include <QtGui/QWindow>
+#include <thread>
+
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), pixmap_item(new QGraphicsPixmapItem), logic_linker(new logic) {
@@ -14,6 +15,9 @@ MainWindow::MainWindow(QWidget* parent)
   scene = new QGraphicsScene(this);
   ui->graphicsView->setScene(scene);
   scene->addItem(pixmap_item);
+  auto* pix_map = logic_linker->get_pixmap();
+  pixmap_item->setPixmap(*pix_map);
+  delete pix_map;
 }
 
 MainWindow::~MainWindow() {
@@ -23,20 +27,15 @@ void MainWindow::set_pixmap(QPixmap* new_pixmap) {
   pixmap_item->setPixmap(*new_pixmap);
 }
 void MainWindow::paintEvent(QPaintEvent* event) {
-  draw();
+//  draw();
 }
-
 void MainWindow::draw() {
-  std::cerr << "start drawing\n";
 //  QPainter painter(ui->graphicsView);
 //  render(&painter);
   auto* pix_map = logic_linker->get_pixmap();
   pixmap_item->setPixmap(*pix_map);
-  std::cerr << "finish drawing\n";
-  std::cerr << pix_map << '\n';
   delete pix_map;
 }
-
 void MainWindow::on_actionRender_triggered() {
   auto [offset_x, offset_y] = std::make_pair(15, 30);
   auto render_window = new RenderWindow(logic_linker);
@@ -45,7 +44,6 @@ void MainWindow::on_actionRender_triggered() {
   render_window->draw();
   render_window->show();
 }
-
 RenderWindow::RenderWindow(logic* new_logic, QWidget* parent) : logic_linker(new_logic), QWidget(parent) {
   timer = new QTimer(this);
   scene = new QGraphicsScene(this);
@@ -72,14 +70,11 @@ RenderWindow::RenderWindow(logic* new_logic, QWidget* parent) : logic_linker(new
   toolbar->addWidget(samples_lable);
   toolbar->layout()->setAlignment(Qt::AlignTop);
   toolbar->resize(this->width(), 50);
-//  toolbar_layout->addWidget(samples_lable);
-//  layout->addWidget(samples_lable);
 
   connect(timer, &QTimer::timeout, this, [&]() { draw(); }, Qt::QueuedConnection);
   connect(timer, &QObject::destroyed, this, [&]() { qDebug() << "timer_delete"; });
   timer->start();
 }
-
 RenderWindow::~RenderWindow() {
   timer->~QTimer();
   scene->~QGraphicsScene();
@@ -90,7 +85,6 @@ RenderWindow::~RenderWindow() {
   samples_lable->~QLabel();
 }
 void RenderWindow::draw() {
-
   if (current_sample >= logic_linker->get_samples()){
     timer->stop();
     timer->~QTimer();
@@ -98,7 +92,7 @@ void RenderWindow::draw() {
 
   set_lable();
   ++current_sample;
-  std::cerr << current_sample << '\n';
+//  std::cerr << current_sample << '\n';
 
   auto* pix_map = logic_linker->get_pixmap();
   auto map_image = pix_map->toImage();
@@ -107,27 +101,36 @@ void RenderWindow::draw() {
   float old_multiplier = (float) current_sample / ((float) current_sample + 1);
   float new_multiplier = 1 / ((float) current_sample + 1);
 
+  std::vector<std::thread* > threads;
+
   for (int y = 0; y < cur_map_image.height(); ++y) {
-    for (int x = 0; x < cur_map_image.width(); ++x) {
+    auto* thread = new std::thread([&, y] {
 
-      auto old_pixel = cur_map_image.pixelColor(x, y);
-      auto new_pixel = map_image.pixelColor(x, y);
+      for (int x = 0; x < cur_map_image.width(); ++x) {
 
-      QColor new_color;
-      new_color.setRedF(old_pixel.redF() * old_multiplier + new_pixel.redF() * new_multiplier);
-      new_color.setBlueF(old_pixel.blueF() * old_multiplier + new_pixel.blueF() * new_multiplier);
-      new_color.setGreenF(old_pixel.greenF() * old_multiplier + new_pixel.greenF() * new_multiplier);
-      new_color.setAlphaF(old_pixel.alphaF() * old_multiplier + new_pixel.alphaF() * new_multiplier);
+        auto old_pixel = cur_map_image.pixelColor(x, y);
+        auto new_pixel = map_image.pixelColor(x, y);
 
-      cur_map_image.setPixelColor(x, y, new_color);
-    }
+        QColor new_color;
+        new_color.setRedF(old_pixel.redF() * old_multiplier + new_pixel.redF() * new_multiplier);
+        new_color.setBlueF(old_pixel.blueF() * old_multiplier + new_pixel.blueF() * new_multiplier);
+        new_color.setGreenF(old_pixel.greenF() * old_multiplier + new_pixel.greenF() * new_multiplier);
+        new_color.setAlphaF(old_pixel.alphaF() * old_multiplier + new_pixel.alphaF() * new_multiplier);
+
+        cur_map_image.setPixelColor(x, y, new_color);
+      }
+    });
+    threads.push_back(thread);
+  }
+  for (auto* th : threads) {
+    th->join();
+    delete th;
   }
 
   *pixmap = QPixmap::fromImage(cur_map_image);
   scene->addPixmap(*pixmap);
   delete pix_map;
 }
-
 void RenderWindow::wheelEvent(QWheelEvent* event) {
   int angle = event->angleDelta().y();
   qreal factor;
