@@ -34,6 +34,8 @@ void MainWindow::draw() {
 //  render(&painter);
   auto* pix_map = logic_linker->get_pixmap();
   pixmap_item->setPixmap(*pix_map);
+//  qreal factor(ui->splitter->width() / pix_map->width());
+//  pixmap_item->setScale(factor);
   delete pix_map;
 }
 void MainWindow::on_actionRender_triggered() {
@@ -50,7 +52,6 @@ RenderWindow::RenderWindow(logic* new_logic, QWidget* parent) : logic_linker(new
   scene->setSceneRect(0, 0, logic_linker->get_camera_rect().first, logic_linker->get_camera_rect().second);
   view = new QGraphicsView(scene);
   view->setScene(scene);
-
 
   layout = new QVBoxLayout(this);
 
@@ -71,7 +72,7 @@ RenderWindow::RenderWindow(logic* new_logic, QWidget* parent) : logic_linker(new
   toolbar->layout()->setAlignment(Qt::AlignTop);
   toolbar->resize(this->width(), 50);
 
-  connect(timer, &QTimer::timeout, this, [&]() { draw(); }, Qt::QueuedConnection);
+  connect(timer, &QTimer::timeout, this, [&]() { draw();});
   connect(timer, &QObject::destroyed, this, [&]() { qDebug() << "timer_delete"; });
   timer->start();
 }
@@ -96,6 +97,7 @@ void RenderWindow::draw() {
 
   auto* pix_map = logic_linker->get_pixmap();
   auto map_image = pix_map->toImage();
+
 
   auto cur_map_image = pixmap->toImage();
   float old_multiplier = (float) current_sample / ((float) current_sample + 1);

@@ -49,6 +49,8 @@ class camera {
   // set image height
   void set_img_h(int other);
 
+  ray get_ray(double u, double v);
+
   ~camera();
 
  private:

@@ -9,7 +9,7 @@ camera::camera() {
   position = point3(0.0, 0.0, 0.0);
   rotation = vec3(0.0, 0.0, 0.0);
   aspect_ratio = 16.0 / 9.0;
-  img_width = 360;
+  img_width = 120;
   img_height = static_cast<int>((float) img_width / aspect_ratio);
   viewport_height = 2.0;
   viewport_width = viewport_height * aspect_ratio;
@@ -93,5 +93,8 @@ int camera::img_h() const {
 }
 void camera::set_img_h(int other) {
   img_height = other;
+}
+ray camera::get_ray(double u, double v) {
+  return ray(position, get_llc() + u*hor_axis() + v*ver_axis() - position);
 }
 camera::~camera() = default;

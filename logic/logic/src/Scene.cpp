@@ -3,9 +3,7 @@
 //
 
 #include "../inc/Scene.h"
-Scene::Scene() {
-  rend_samples = 1;
-}
+Scene::Scene() = default;
 int Scene::get_render_samples() const{
   return rend_samples;
 }

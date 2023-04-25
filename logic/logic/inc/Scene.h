@@ -20,7 +20,9 @@ class Scene {
   std::string location;
   std::unordered_map<std::string, std::string> objects;
   camera camera_;
-  int rend_samples;
+  int rend_samples = 64;
+  int sample_x = 32;
+  int sample_y = 32;
 };
 
 #endif //ENGINE_LOGIC_SCENES_SRC_SCENE_H_
