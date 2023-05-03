@@ -6,6 +6,7 @@
 #define ENGINE_FRONT_MAINWINDOW_H_
 
 #include "resources.h"
+#include <queue>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,26 +36,31 @@ class MainWindow : public QMainWindow, protected QOpenGLFunctions {
   logic* logic_linker;
 };
 
-class RenderWindow: public QWidget{
-  Q_OBJECT
+class RenderWindow : public QWidget {
+ Q_OBJECT
  public:
-  explicit RenderWindow(logic* new_linker, QWidget *parent = nullptr);
+  explicit RenderWindow(logic* new_linker, QWidget* parent = nullptr);
   ~RenderWindow() override;
 
-  void wheelEvent (QWheelEvent* event) override;
+  void wheelEvent(QWheelEvent* event) override;
 
-  void draw();
+  void draw(std::pair<int, QTimer>* q_timer = new std::pair<int, QTimer>(), std::pair<int, int> start = {0, 0}, std::pair<int, int> end = {-1, -1});
+  void render();
 
-  void set_lable();
-
-// protected slots:
-//  void zoom_in();
-//  void zoom_out();
+  void set_lable(int sample);
 
  private:
   int current_sample = 0;
 
-  QPixmap* pixmap;
+  int render_cell_width = 32;
+  int render_cell_height = 32;
+
+  int max_threads = 1;
+  int current_threads = 0;
+  int current_cell = 0;
+
+
+  QImage* pixmap;
 
   QGraphicsScene* scene;
   QGraphicsView* view;
@@ -64,5 +70,7 @@ class RenderWindow: public QWidget{
   QLayout* layout;
   QToolBar* toolbar;
   QLabel* samples_lable;
+  std::queue<std::pair<int, QTimer>*> threads;
+
 };
 #endif //ENGINE_FRONT_MAINWINDOW_H_

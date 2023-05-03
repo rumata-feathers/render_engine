@@ -1,17 +1,16 @@
 #ifndef ENGINE_LOGIC_LOGIC_INC_RAY_H_
 #define ENGINE_LOGIC_LOGIC_INC_RAY_H_
 
-#include "vector3.h"
+#include "vec3.h"
 
 class ray {
  public:
-  ray();
   ray(const point3& origin, const vec3& direction);
 
-  point3 origin() const;
-  vec3 direction() const;
+  [[nodiscard]] point3 origin() const;
+  [[nodiscard]] vec3 direction() const;
 
-  point3 at(double t) const;
+  [[nodiscard]] point3 at(double t) const;
 
   ~ray();
  public:

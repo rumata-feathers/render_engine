@@ -6,7 +6,7 @@
 #define ENGINE_LOGIC_LOGIC_INC_SPHERE_H_
 
 #include "hittable.h"
-#include "vector3.h"
+#include "vec3.h"
 
 class sphere : public hittable {
  public:

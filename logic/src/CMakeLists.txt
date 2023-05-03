@@ -1,5 +1,6 @@
 set(PROJECT_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/logic.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../inc/logic.h
 #        ${CMAKE_CURRENT_SOURCE_DIR}/testing.cpp
         ${BACK_LOGIC_SRC}
         )

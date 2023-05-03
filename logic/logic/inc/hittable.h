@@ -6,6 +6,7 @@
 #define ENGINE_LOGIC_LOGIC_INC_HITTABLE_H_
 
 #include "ray.h"
+#include "vec3.h"
 
 struct hit_record {
   // point of intersection

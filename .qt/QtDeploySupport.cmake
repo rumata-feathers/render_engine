@@ -24,7 +24,7 @@ endif()
 # These are internal implementation details. They may be removed at any time.
 set(__QT_DEPLOY_SYSTEM_NAME "Darwin")
 set(__QT_DEPLOY_IS_SHARED_LIBS_BUILD "ON")
-set(__QT_DEPLOY_TOOL "/opt/homebrew/opt/qt/bin/macdeployqt")
+set(__QT_DEPLOY_TOOL "/opt/homebrew/bin/macdeployqt")
 set(__QT_DEPLOY_IMPL_DIR "/Users/georgiikuznetsov/Desktop/coding/engine/.qt")
 set(__QT_DEPLOY_VERBOSE "")
 set(__QT_CMAKE_EXPORT_NAMESPACE "Qt6")

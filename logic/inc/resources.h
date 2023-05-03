@@ -12,8 +12,8 @@
 #include "../logic/inc/Scene.h"
 #include "../logic/inc/camera.h"
 #include "../logic/inc/ray.h"
-#include "../logic/inc/vector3.h"
+#include "../logic/inc/vec3.h"
 //#include "../logic/ui_src/Scene.cpp"
-#include "../logic/src/vector3.cpp"
+//#include "../logic/src/vec3.cpp"
 
 #endif //ENGINE_LOGIC_INC_RESOURCES_H_

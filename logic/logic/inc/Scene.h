@@ -15,12 +15,16 @@ class Scene {
 
   Scene();
   ~Scene();
+
+  int rend_samples = 20;
+  int max_depth = 5;
+
  private:
   std::string name;
   std::string location;
   std::unordered_map<std::string, std::string> objects;
   camera camera_;
-  int rend_samples = 64;
+
   int sample_x = 32;
   int sample_y = 32;
 };

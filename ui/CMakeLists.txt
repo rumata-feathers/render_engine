@@ -10,7 +10,7 @@ set(MAIN_WINDOW_PROJECT_SOURCES
         main_window.h
         ui_main_window.h
         ../testing.cpp
-        ${main_window_SRC}
+#        ${main_window_SRC}
         ${LOGIC_SRC}
         )
 

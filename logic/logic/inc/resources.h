@@ -5,6 +5,7 @@
 #ifndef ENGINE_LOGIC_LOGIC_INC_RESOURCES_H_
 #define ENGINE_LOGIC_LOGIC_INC_RESOURCES_H_
 #define _USE_MATH_DEFINES
+
 #include <memory>
 #include <numeric>
 #include <math.h>
@@ -36,12 +37,10 @@ inline double clamp(double x, double min, double max) {
 
 // includes
 #include "ray.h"
-#include "camera.h"
-#include "vector3.h"
-#include "hittable.h"
-#include "hittable_list.h"
-#include "Scene.h"
-#include "sphere.h"
-#include "triangle.h"
+#include "vec3.h"
+//#include "sphere.h"
+//#include "triangle.h"
+//#include "hittable_list.h"
+//#include "hittable.h"
 
 #endif //ENGINE_LOGIC_LOGIC_INC_RESOURCES_H_

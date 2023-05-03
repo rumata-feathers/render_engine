@@ -1,6 +1,5 @@
 #include "../inc/ray.h"
 
-ray::ray() = default;
 ray::ray(const point3& origin, const vec3& direction): orig(origin), dir(direction) {}
 vec3 ray::direction() const {
   return dir;

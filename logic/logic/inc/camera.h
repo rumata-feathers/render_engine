@@ -5,7 +5,7 @@
 #ifndef ENGINE_LOGIC_LOGIC_INC_CAMERA_H_
 #define ENGINE_LOGIC_LOGIC_INC_CAMERA_H_
 
-#include "vector3.h"
+#include "vec3.h"
 #include "ray.h"
 
 class camera {
@@ -21,7 +21,7 @@ class camera {
   void set_rot(vec3&);
 
   // get new axes of the camera
-  [[nodiscard]] vector3<vec3> axes() const;
+  [[nodiscard]] std::vector<vec3> axes() const;
 
   // get horizontal axis of the image
   [[nodiscard]] vec3 hor_axis() const;
