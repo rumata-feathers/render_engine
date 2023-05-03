@@ -55,7 +55,7 @@ class RenderWindow : public QWidget {
   int render_cell_width = 32;
   int render_cell_height = 32;
 
-  int max_threads = 1;
+  int max_threads = 4;
   int current_threads = 0;
   int current_cell = 0;
 

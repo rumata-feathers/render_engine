@@ -16,8 +16,8 @@ class Scene {
   Scene();
   ~Scene();
 
-  int rend_samples = 20;
-  int max_depth = 5;
+  int rend_samples = 50;
+  int max_depth = 1;
 
  private:
   std::string name;

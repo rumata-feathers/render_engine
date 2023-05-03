@@ -8,6 +8,8 @@
 #include <QtGui/QWindow>
 #include <thread>
 #include <chrono>
+#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/QtConcurrentRun>
 
 using namespace std::chrono;
 
@@ -17,15 +19,11 @@ MainWindow::MainWindow(QWidget* parent)
   scene = new QGraphicsScene(this);
   ui->graphicsView->setScene(scene);
   scene->addItem(pixmap_item);
-//  std::thread t( [&](){
-//    auto* pix_map = logic_linker->get_pixmap();
-//    scene->addPixmap(QPixmap::fromImage(*pix_map));
-//    delete pix_map;});
-//  t.detach();
-//  auto* pix_map = logic_linker->get_pixmap();
-//  pixmap_item->setPixmap(*pix_map);
-//  scene->addPixmap(QPixmap::fromImage(*pix_map));
-//  delete pix_map;
+  std::thread t( [&](){
+    auto* pix_map = logic_linker->get_pixmap();
+    pixmap_item->setPixmap(QPixmap::fromImage(*pix_map));
+    delete pix_map;});
+  t.detach();
 }
 
 MainWindow::~MainWindow() {
@@ -137,11 +135,19 @@ RenderWindow::~RenderWindow() {
 
 }
 void RenderWindow::draw(std::pair<int, QTimer>* q_thread, std::pair<int, int> start, std::pair<int, int> end) {
-//  std::cerr << "render_window from " << start << " to " << end << " draw sample " << q_thread->first << '\n';
+  std::cerr << "render_window from " << start << " to " << end << " draw sample " << q_thread->first << '\t';
+  std::cerr << q_thread->second.thread()->currentThreadId() << ' ' << q_thread->second.thread()->isRunning() << ' '
+            << q_thread->second.isActive() << ' '
+            << current_threads << '\n';
   if (q_thread->first > logic_linker->get_samples()) {
     q_thread->second.stop();
+//    q_thread->second.thread()->terminate();
+//    q_thread->second.deleteLater();
+//    q_thread->second.thread()->quit();
+//    q_thread->second.thread()->exit();
+//    q_thread->second.deleteLater();
     --current_threads;
-    q_thread->second.~QTimer();
+    delete q_thread;
     return;
   }
 
@@ -152,6 +158,7 @@ void RenderWindow::draw(std::pair<int, QTimer>* q_thread, std::pair<int, int> st
   } catch (...) {
     std::cout << "exception from draw->get_pixmap()\n";
   }
+//  scene->update(start.first, start.second, end.first - start.first, end.second - start.second);
   scene->addPixmap(QPixmap::fromImage(*pixmap));
   this->update();
 //  std::cerr << "finish render\n";
@@ -201,12 +208,14 @@ bool can_thread(std::vector<std::pair<int, QTimer>*>* threads, int max_samples, 
   return threads_num < max_threads;
 }
 
-
-
 void RenderWindow::render() {
-  if (current_threads >= max_threads){
+//  std::cout << current_threads << '\n';
+  if (current_threads >= max_threads) {
     return;
   }
+
+  int max_samples = logic_linker->get_samples();
+//  auto* thread = new QThread();
 
   ++current_threads;
   int cell_num = 0;
@@ -228,36 +237,69 @@ void RenderWindow::render() {
       int x = hor_cell * render_cell_width;
       int cell_width = (x + render_cell_width > logic_linker->get_camera_rect().first) ?
                        logic_linker->get_camera_rect().first - x : render_cell_width;
-      auto* p = new std::pair<int, QTimer>{0, this};
-      threads.push(p);
+
+      auto* p = new std::pair<int, QTimer>();
+//      thread->start();
       p->second.start();
-      connect(&p->second,
-              &QTimer::timeout,
-              this,
-              [&, x, y, cell_height, cell_width, p, this]() {
-                draw(p, {x, y}, {x + cell_width, y + cell_height});
-                update();
-              });
+
+      connect(&p->second, &QTimer::timeout, this, [&, x, y, cell_height, cell_width, p, this]() {
+        draw(p, {x, y}, {x + cell_width, y + cell_height});
+        scene->update(QRect(x, y, cell_width, cell_height));
+      });
+//      connect(thread,
+//              &QThread::started,
+//              this,
+//              [&, p]() {
+//                p->second.start();
+//              });
+//      connect(thread, &QThread::finished, this, [&, p, thread] {
+//        std::cout << "lol\n";
+//        p->second.stop();
+//        delete p;
+//        delete thread;
+//      });
+//      thread->start();
+//      p->second.start();
       return;
 //      std::cout << std::pair<int, int>(x, y) << " -- " << std::pair<int, int>(x + cell_width, y + cell_height) << '\n';
     }
   }
 
-//  int x = 0;
-//  int y = 0;
+
+//  int x = 120;
+//  int y = 200;
 //  int cell_width = 32;
 //  int cell_height = 32;
-//  threads.push_back(new QTimer());
-//  auto* sample = new int;
-//  threads[threads.size() - 1]->start();
-//  connect(threads[threads.size() - 1],
-//          &QTimer::timeout,
+//  int max_samples = 50;
+//  connect(thread,
+//          &QThread::started,
 //          this,
-//          [&, x, y, cell_height, cell_width, threads, sample, this]() {
-//            draw(sample, threads[threads.size() - 1], {x, y}, {x + cell_width, y + cell_height});
-//            update();
+//          [&, x, y, cell_height, cell_width]() {
+//              auto* p = new std::pair<int, QTimer>();
+//              p->second.start();
+//              connect(&p->second, &QTimer::timeout, this, [&, p, x, y, cell_width, cell_height]{
+//                draw(p, {x, y}, {x + cell_width, y + cell_height});
+//                update();
+//              });
 //          });
-//  timer->stop();
+//  connect(thread, &QThread::finished, this, [&, thread, max_samples] {
+//    if (p->first >= max_samples) {
+//      std::cout << "lol\n";
+//      p->second.stop();
+//      delete p;
+//      thread->deleteLater();
+//    } else{
+//      thread->start();
+//      emit thread->start();
+//    }
+//  });
+//  thread->start();
+//  auto* p = new std::pair<int, QTimer>();
+//  p->second.start();
+//  connect(&p->second, &QTimer::timeout, this, [&, p, x, y, cell_width, cell_height]{
+//    draw(p, {x, y}, {x + cell_width, y + cell_height});
+//  });
+  timer->stop();
 }
 void RenderWindow::wheelEvent(QWheelEvent* event) {
   int angle = event->angleDelta().y();

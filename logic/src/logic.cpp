@@ -51,11 +51,12 @@ QImage* logic::get_pixmap(QImage* pix_map, int sample, std::pair<int, int> start
 
   if (pix_map == nullptr)
     pix_map = new QImage((int) cur_camera.img_w(), (int) cur_camera.img_h(), QImage::Format_RGB32);
-  return pix_map;
+//  return pix_map;
   bool complete = false;
   int cell_w = end.first - start.first;
   int cell_h = end.second - start.second;
-  int max_threads = (int) std::thread::hardware_concurrency();
+//  int max_threads = (int) std::thread::hardware_concurrency();
+  int max_threads = 8;
   // how much to give for the thread
   int thread_cell_w = std::floor((double) cell_w / (double) max_threads);
   int thread_cell_h = std::floor((double) cell_h / (double) max_threads);
@@ -66,46 +67,43 @@ QImage* logic::get_pixmap(QImage* pix_map, int sample, std::pair<int, int> start
   // coefficient for new pixel
   double new_multiplier = 1 / ((float) sample + 1);
 
-  while (!complete) {
-    try {
-      for (int thread_num = 0; thread_num < max_threads; ++thread_num) {
-        int y_start = (int) start.second + thread_num * thread_cell_h;
-        int y_end = (thread_num == max_threads - 1) ? end.second : (int) start.second + (thread_num + 1) * thread_cell_h;
+  try {
+    for (int thread_num = 0; thread_num < max_threads; ++thread_num) {
+      int y_start = (int) start.second + thread_num * thread_cell_h;
+      int y_end = (thread_num == max_threads - 1) ? end.second : (int) start.second + (thread_num + 1) * thread_cell_h;
 
-        auto* thread = new std::thread([&, y_start, y_end] {
-          for (int j = y_start; j < y_end; ++j) {
+      auto* thread = new std::thread([&, y_start, y_end] {
+        for (int j = y_start; j < y_end; ++j) {
 
-            // vertical offset of the casting ray
-            auto v = double(cur_camera.img_h() - j + random_double()) / (cur_camera.img_h() - 1);
+          // vertical offset of the casting ray
+          auto v = double(cur_camera.img_h() - j + random_double()) / (cur_camera.img_h() - 1);
 
-            for (int k = start.first; k < end.first; ++k) {
-              auto u = double(k + random_double()) / (cur_camera.img_w() - 1);
-              ray r = cur_camera.get_ray(u, v);
-              color pixel_color = ray_color(r, world, cur_scene->max_depth);
+          for (int k = start.first; k < end.first; ++k) {
+            auto u = double(k + random_double()) / (cur_camera.img_w() - 1);
+            ray r = cur_camera.get_ray(u, v);
+            color pixel_color = ray_color(r, world, cur_scene->max_depth);
 
-              auto old_pix = pix_map->pixelColor(k, j);
-              pixel_color *= new_multiplier;
-              pixel_color[0] += old_pix.redF() * old_multiplier;
-              pixel_color[1] += old_pix.greenF() * old_multiplier;
-              pixel_color[2] += old_pix.blueF() * old_multiplier;
-              pix_map->setPixelColor(k, j, q_color(pixel_color));
-            }
+            auto old_pix = pix_map->pixelColor(k, j);
+            pixel_color *= new_multiplier;
+            pixel_color[0] += old_pix.redF() * old_multiplier;
+            pixel_color[1] += old_pix.greenF() * old_multiplier;
+            pixel_color[2] += old_pix.blueF() * old_multiplier;
+            pix_map->setPixelColor(k, j, q_color(pixel_color));
           }
-        });
-        threads.push_back(thread);
-      }
-      for (auto* th : threads) {
-        if (th->joinable()) {
-          th->join();
         }
-        delete th;
+      });
+      threads.push_back(thread);
+    }
+    for (auto* th : threads) {
+      if (th->joinable()) {
+        th->join();
       }
-      complete = true;
-    } catch (...) {
-      std::cerr << "got exception in logic::get_pixmap\n";
-      for (auto* th : threads) {
-        delete th;
-      }
+      delete th;
+    }
+  } catch (...) {
+    std::cerr << "got exception in logic::get_pixmap\n";
+    for (auto* th : threads) {
+      delete th;
     }
   }
   return pix_map;
