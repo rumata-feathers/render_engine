@@ -2,9 +2,11 @@
 // Created by Георгий Кузнецов on 24.04.2023.
 //
 
+#include <utility>
+
 #include "../inc/sphere.h"
 sphere::sphere() = default;
-sphere::sphere(const point3& cntr, double r) : center_(cntr), radius_(r) {}
+sphere::sphere(const point3& cntr, double r, std::shared_ptr<material> m) : center_(cntr), radius_(r), mat_ptr(std::move(m)) {}
 bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
   // equation:
   // t^2*b^2 + 2t*b⋅(A-C)+(A-C)⋅(A-C)−𝑟^2 = 0
@@ -32,6 +34,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
   // there is collision
   rec.t = root;
   rec.p = r.at(rec.t);
+  rec.mat_ptr = mat_ptr;
   vec3 outward_normal = (rec.p - center_) / radius_;
   rec.set_face_normal(r, outward_normal);
 

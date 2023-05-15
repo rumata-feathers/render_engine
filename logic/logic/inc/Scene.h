@@ -14,16 +14,17 @@ class Scene {
   camera get_camera() const;
 
   Scene();
+  Scene(const camera& cam): camera_(cam) {}
   ~Scene();
 
-  int rend_samples = 50;
-  int max_depth = 1;
+  int rend_samples = 30;
+  int max_depth = 10;
 
+  camera camera_;
  private:
   std::string name;
   std::string location;
   std::unordered_map<std::string, std::string> objects;
-  camera camera_;
 
   int sample_x = 32;
   int sample_y = 32;

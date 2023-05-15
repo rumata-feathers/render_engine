@@ -5,16 +5,34 @@
 #ifndef ENGINE_LOGIC_LOGIC_INC_CAMERA_H_
 #define ENGINE_LOGIC_LOGIC_INC_CAMERA_H_
 
-#include "vec3.h"
-#include "ray.h"
+#include "resources.h"
 
 class camera {
  public:
   camera();
+  camera(double vfov, // vertical field-of-view in degrees
+         double aspect_ratio);
+  camera(const point3& lookfrom,
+         const point3& lookat,
+         const vec3& vup,
+         double vfov, // vertical field-of-view in degrees
+         double aspect_ratio);
+  camera(const camera& other) {
+    position = other.position;
+    horizontal = other.horizontal;
+    vertical = other.vertical;
+    llc = other.llc;
+    aspect_ratio = other.aspect_ratio;
+    img_width = other.img_width;
+    img_height = other.img_height;
+
+    focal_length = other.focal_length;
+  }
   // get camera position
-  [[nodiscard]] point3 pos() const;
+  [[nodiscard]]
+  point3 pos() const;
   // set camera position
-  void set_pos(point3&);
+  void set_pos(const point3&);
   // get camera rotation
   [[nodiscard]] vec3 rot() const;
   // set camera rotation
@@ -37,7 +55,6 @@ class camera {
   // set camera focal length
   void set_focal_len(float other);
 
-
   // get image size {width, height}
   [[nodiscard]] std::pair<int, int> size() const;
   // get image width
@@ -49,20 +66,34 @@ class camera {
   // set image height
   void set_img_h(int other);
 
-  ray get_ray(double u, double v);
+  ray get_ray(double, double) const;
+
+  camera& operator=(const camera& other){
+    position = other.position;
+    horizontal = other.horizontal;
+    vertical = other.vertical;
+    llc = other.llc;
+    aspect_ratio = other.aspect_ratio;
+    img_width = other.img_width;
+    img_height = other.img_height;
+
+    focal_length = other.focal_length;
+    return *this;
+  }
 
   ~camera();
 
  private:
-  point3 position;
-  vec3 rotation;
-  float aspect_ratio;
-  int img_width;
+  point3 position = point3(0.0, 0.0, 0.0);
+  vec3 rotation = point3(0.0, 0.0, 0.0);
+  point3 llc;
+  float aspect_ratio = 16.0 / 9.0;
+  int img_width = 120;
   int img_height;
 
-  float viewport_height;
-  float viewport_width;
-  float focal_length;
+  vec3 horizontal;
+  vec3 vertical;
+  float focal_length = 1.0;
 };
 
 #endif //ENGINE_LOGIC_LOGIC_INC_CAMERA_H_

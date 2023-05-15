@@ -52,6 +52,11 @@ class vec3 {
 //    color_.setBlueF(z());
 //    return color_;
 //  }
+  bool near_zero() const {
+    // Return true if the vector is close to zero in all dimensions.
+    const auto s = 1e-8;
+    return (fabs(list[0]) < s) && (fabs(list[1]) < s) && (fabs(list[2]) < s);
+  }
  private:
   std::vector<double> list;
 };
@@ -73,6 +78,9 @@ vec3 unit_vector(const vec3& v);
 std::vector<vec3> mat_mul(const std::vector<vec3>& mat1, const std::vector<vec3>& mat2);
 
 vec3 random_in_unit_sphere();
+vec3 random_unit_vector();
+vec3 reflect(const vec3& v, const vec3& n);
+vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat);
 
 // Type aliases for vec3
 using point3 = vec3;   // 3D point

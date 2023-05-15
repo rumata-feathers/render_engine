@@ -12,15 +12,16 @@ class sphere : public hittable {
  public:
   sphere();
 
-  sphere(const point3& cntr, double r);
+  sphere(const point3& cntr, double r, std::shared_ptr<material> m);
 
   virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
 
   ~sphere();
 
  public:
-  point3 center_;
+  point3 center_ = {0, 0, 0};
   double radius_ = 1;
+  std::shared_ptr<material> mat_ptr;
 };
 
 #endif //ENGINE_LOGIC_LOGIC_INC_SPHERE_H_

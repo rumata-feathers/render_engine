@@ -5,19 +5,18 @@
 #include "../inc/camera.h"
 
 camera::camera() {
-  position = point3(0.0, 0.0, 0.0);
-  rotation = vec3(0.0, 0.0, 0.0);
-  aspect_ratio = 16.0 / 9.0;
-  img_width = 480;
   img_height = static_cast<int>((float) img_width / aspect_ratio);
-  viewport_height = 2.0;
-  viewport_width = viewport_height * aspect_ratio;
-  focal_length = 1.0;
+  auto viewport_height = 2.0;
+  auto viewport_width = viewport_height * aspect_ratio;
+
+  horizontal = vec3(viewport_width, 0.0, 0.0);
+  vertical = vec3(0.0, viewport_height, 0.0);
+  llc = position - horizontal / 2 - vertical / 2 - vec3(0, 0, focal_length);
 }
 point3 camera::pos() const {
   return position;
 }
-void camera::set_pos(point3& other_position) {
+void camera::set_pos(const point3& other_position) {
   position = other_position;
 }
 vec3 camera::rot() const {
@@ -60,17 +59,14 @@ std::vector<vec3> camera::axes() const {
   axis[2].normalize();
   return axis;
 }
-vec3 camera::norm_axis() const {
-  return focal_length * axes()[2];
-}
 vec3 camera::hor_axis() const {
-  return viewport_width * axes()[0];
+  return horizontal;
 }
 vec3 camera::ver_axis() const {
-  return viewport_height * axes()[1];
+  return vertical;
 }
 vec3 camera::get_llc() const {
-  return position - hor_axis() / 2.0 - ver_axis() / 2.0 - norm_axis();
+  return llc;
 }
 float camera::focal_len() const {
   return focal_length;
@@ -93,7 +89,36 @@ int camera::img_h() const {
 void camera::set_img_h(int other) {
   img_height = other;
 }
-ray camera::get_ray(double u, double v) {
-  return ray(position, get_llc() + u*hor_axis() + v*ver_axis() - position);
+ray camera::get_ray(double s, double t) const {
+  return {position, llc + s * horizontal + t * vertical - position};
+}
+camera::camera(double vfov, double aspect_ratio) {
+  auto theta = degrees_to_radians(vfov);
+  auto h = tan(theta / 2);
+  auto viewport_height = 2 * h;
+  auto viewport_width = aspect_ratio * viewport_height;
+
+  horizontal = vec3(viewport_width, 0.0, 0.0);
+  vertical = vec3(0.0, viewport_height, 0.0);
+  llc = position - horizontal / 2 - vertical / 2 - vec3(0, 0, focal_length);
+}
+camera::camera(const point3& lookfrom, const point3& lookat, const vec3& vup, double vfov, double aspect_ratio)
+    : position(lookfrom) {
+  auto theta = degrees_to_radians(vfov);
+  auto h = tan(theta / 2);
+  auto viewport_height = 2.0 * h;
+  auto viewport_width = aspect_ratio * viewport_height;
+
+  auto w = unit_vector(lookfrom - lookat);
+  auto u = unit_vector(cross(vup, w));
+  auto v = cross(w, u);
+
+
+  img_height = static_cast<int>((float) img_width / aspect_ratio);
+
+  position = lookfrom;
+  horizontal = viewport_width * u;
+  vertical = viewport_height * v;
+  llc = position - horizontal / 2 - vertical / 2 - w;
 }
 camera::~camera() = default;

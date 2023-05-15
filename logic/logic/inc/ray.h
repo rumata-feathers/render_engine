@@ -5,6 +5,7 @@
 
 class ray {
  public:
+  ray();
   ray(const point3& origin, const vec3& direction);
 
   [[nodiscard]] point3 origin() const;

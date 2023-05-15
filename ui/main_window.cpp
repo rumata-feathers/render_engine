@@ -10,6 +10,11 @@
 #include <chrono>
 #include <QtConcurrent/QtConcurrent>
 #include <QtConcurrent/QtConcurrentRun>
+#include <QOpenGLWindow>
+#include <QtOpenGLWidgets/QtOpenGLWidgets>
+#include <QtOpenGL>
+#include <QtOpenGLWidgets/QOpenGLWidget>
+#include <GLUT/glut.h>
 
 using namespace std::chrono;
 
@@ -19,10 +24,11 @@ MainWindow::MainWindow(QWidget* parent)
   scene = new QGraphicsScene(this);
   ui->graphicsView->setScene(scene);
   scene->addItem(pixmap_item);
-  std::thread t( [&](){
+  std::thread t([&]() {
     auto* pix_map = logic_linker->get_pixmap();
     pixmap_item->setPixmap(QPixmap::fromImage(*pix_map));
-    delete pix_map;});
+    delete pix_map;
+  });
   t.detach();
 }
 
@@ -50,11 +56,20 @@ void MainWindow::draw() {
 }
 void MainWindow::on_actionRender_triggered() {
   auto [offset_x, offset_y] = std::make_pair(15, 30);
-  auto render_window = new RenderWindow(logic_linker);
-  std::cout << "render_window: " << render_window << '\n';
-  render_window->resize(this->width(), this->height());
-  render_window->move(this->pos().operator+=(QPoint(offset_x, offset_y)));
-  render_window->show();
+  render_window_ = new RenderWindow(logic_linker);
+  std::cout << "render_window: " << render_window_ << '\n';
+  render_window_->resize(this->width(), this->height());
+  render_window_->move(this->pos().operator+=(QPoint(offset_x, offset_y)));
+  render_window_->show();
+}
+void MainWindow::on_actionSave_triggered() {
+  if (!render_window_){
+    on_actionRender_triggered();
+    render_window_->render();
+  }
+//  render_window_->thread().
+  render_window_->pixmap->save("smth.png", "PNG", -1);
+//  render_window_->deleteLater();
 }
 void something(QImage* pix_map) {
   QColor color;
@@ -73,7 +88,8 @@ void something(QImage* pix_map) {
   }
 }
 
-RenderWindow::RenderWindow(logic* new_logic, QWidget* parent) : logic_linker(new_logic), QWidget(parent) {
+RenderWindow::RenderWindow(logic* new_logic, QWidget* parent) : logic_linker(new_logic), QWidget(parent), ui(new Render_Ui::RenderWindow) {
+
   timer = new QTimer(this);
   scene = new QGraphicsScene(this);
   scene->setSceneRect(0, 0, logic_linker->get_camera_rect().first, logic_linker->get_camera_rect().second);
@@ -81,6 +97,7 @@ RenderWindow::RenderWindow(logic* new_logic, QWidget* parent) : logic_linker(new
   view->setScene(scene);
 
   layout = new QVBoxLayout(this);
+  ui->setupUi(this);
 
   pixmap =
       new QImage(logic_linker->get_camera_rect().first, logic_linker->get_camera_rect().second, QImage::Format_ARGB32);
@@ -112,6 +129,7 @@ std::ostream& operator<<(std::ostream& stream, const std::pair<int, int>& p) {
   return stream;
 }
 RenderWindow::~RenderWindow() {
+
   pixmap->~QImage();
   delete pixmap;
 
@@ -134,18 +152,13 @@ RenderWindow::~RenderWindow() {
   delete samples_lable;
 
 }
-void RenderWindow::draw(std::pair<int, QTimer>* q_thread, std::pair<int, int> start, std::pair<int, int> end) {
-  std::cerr << "render_window from " << start << " to " << end << " draw sample " << q_thread->first << '\t';
-  std::cerr << q_thread->second.thread()->currentThreadId() << ' ' << q_thread->second.thread()->isRunning() << ' '
-            << q_thread->second.isActive() << ' '
-            << current_threads << '\n';
+void RenderWindow::draw(std::pair<int, QTimer>* q_thread, std::pair<int, int> start, std::pair<int, int> end)  {
+//  std::cerr << "render_window from " << start << " to " << end << " draw sample " << q_thread->first << '\t';
+//  std::cerr << q_thread->second.thread()->currentThreadId() << ' ' << q_thread->second.thread()->isRunning() << ' '
+//            << q_thread->second.isActive() << ' '
+//            << current_threads << '\n';
   if (q_thread->first > logic_linker->get_samples()) {
     q_thread->second.stop();
-//    q_thread->second.thread()->terminate();
-//    q_thread->second.deleteLater();
-//    q_thread->second.thread()->quit();
-//    q_thread->second.thread()->exit();
-//    q_thread->second.deleteLater();
     --current_threads;
     delete q_thread;
     return;
@@ -209,7 +222,6 @@ bool can_thread(std::vector<std::pair<int, QTimer>*>* threads, int max_samples, 
 }
 
 void RenderWindow::render() {
-//  std::cout << current_threads << '\n';
   if (current_threads >= max_threads) {
     return;
   }
@@ -239,66 +251,24 @@ void RenderWindow::render() {
                        logic_linker->get_camera_rect().first - x : render_cell_width;
 
       auto* p = new std::pair<int, QTimer>();
-//      thread->start();
       p->second.start();
 
+//      QtConcurrent::run([&, x, y, cell_height, cell_width, p, this]{
+//        draw(p, {x, y}, {})
+//      });
       connect(&p->second, &QTimer::timeout, this, [&, x, y, cell_height, cell_width, p, this]() {
         draw(p, {x, y}, {x + cell_width, y + cell_height});
         scene->update(QRect(x, y, cell_width, cell_height));
       });
-//      connect(thread,
-//              &QThread::started,
-//              this,
-//              [&, p]() {
-//                p->second.start();
-//              });
-//      connect(thread, &QThread::finished, this, [&, p, thread] {
-//        std::cout << "lol\n";
-//        p->second.stop();
-//        delete p;
-//        delete thread;
-//      });
-//      thread->start();
-//      p->second.start();
       return;
-//      std::cout << std::pair<int, int>(x, y) << " -- " << std::pair<int, int>(x + cell_width, y + cell_height) << '\n';
     }
   }
+  QFile file("file_1.png");
 
-
-//  int x = 120;
-//  int y = 200;
-//  int cell_width = 32;
-//  int cell_height = 32;
-//  int max_samples = 50;
-//  connect(thread,
-//          &QThread::started,
-//          this,
-//          [&, x, y, cell_height, cell_width]() {
-//              auto* p = new std::pair<int, QTimer>();
-//              p->second.start();
-//              connect(&p->second, &QTimer::timeout, this, [&, p, x, y, cell_width, cell_height]{
-//                draw(p, {x, y}, {x + cell_width, y + cell_height});
-//                update();
-//              });
-//          });
-//  connect(thread, &QThread::finished, this, [&, thread, max_samples] {
-//    if (p->first >= max_samples) {
-//      std::cout << "lol\n";
-//      p->second.stop();
-//      delete p;
-//      thread->deleteLater();
-//    } else{
-//      thread->start();
-//      emit thread->start();
-//    }
-//  });
-//  thread->start();
-//  auto* p = new std::pair<int, QTimer>();
-//  p->second.start();
-//  connect(&p->second, &QTimer::timeout, this, [&, p, x, y, cell_width, cell_height]{
-//    draw(p, {x, y}, {x + cell_width, y + cell_height});
-//  });
+  if(pixmap->save(file.fileName(), 0, -1))
+    std::cout << "saved!\n";
+  else
+    std::cout << "failed!\n";
   timer->stop();
 }
 void RenderWindow::wheelEvent(QWheelEvent* event) {
@@ -315,3 +285,88 @@ void RenderWindow::set_lable(int sample) {
   std::string text = "samples: " + std::to_string(sample) + "/" + std::to_string(logic_linker->get_samples());
   samples_lable->setText(text.c_str());
 }
+
+//Render_Window::Render_Window(logic* linker, QWidget* parent) : linker(linker), ui(new Render_Ui::Render_Window) {
+//  ui->setupUi(this);
+//}
+//void Render_Window::mousePressEvent(QMouseEvent* e) {
+//  QWindow::mousePressEvent(e);
+//}
+//void Render_Window::mouseReleaseEvent(QMouseEvent* e) {
+//  QWindow::mouseReleaseEvent(e);
+//}
+//void Render_Window::timerEvent(QTimerEvent* e) {
+//  QObject::timerEvent(e);
+//}
+//void Render_Window::initializeGL() {
+//  setTitle("Render");
+//  // Set up the rendering context, load shaders and other resources, etc.:
+//  initializeOpenGLFunctions();
+//  glClearColor(0, 0, 0, 1);
+//  glEnable(GL_DEPTH_TEST);
+//  glEnable(GL_LIGHT0);
+//  glEnable(GL_LIGHTING);
+//  glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+//  glEnable(GL_COLOR_MATERIAL);
+//}
+//void Render_Window::resizeGL(int w, int h) {
+//  glViewport(0, 0, w, h);
+//  glMatrixMode(GL_PROJECTION);
+//  glLoadIdentity();
+//  gluPerspective(45, (float) w / h, 0.01, 100.0);
+//  glMatrixMode(GL_MODELVIEW);
+//  glLoadIdentity();
+//  gluLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0);
+//}
+//
+//void Render_Window::paintGL() {
+//  // set background colour
+//  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//  GLfloat color[] = {float(23) / 255, float(23) / 255, float(25) / 255, float(255) / 255};
+//  glClearColor(color[0], color[1], color[2], color[3]);
+//
+//  const int w = linker->get_camera_rect().first;
+//  const int h = linker->get_camera_rect().second;
+//  const double x = 0;
+//  const double y = 0;
+//
+//  //buffer array
+////  float* pba = new float[w*h*3];
+//  float* pba = nullptr;
+////  for (int i = 0; i < h; ++i) {
+////    for (int j = 0; j < w; ++j) {
+////      pba[(i*w + j) * 3] = float(i) / float(h);
+////      pba[(i*w + j)* 3 + 1] = float(i + j) / float(w + h);
+////      pba[(i*w + j)* 3 + 2] = float(j) / float(w);
+////    }
+////  }
+//
+////  GLuint texID;
+////  glGenTextures (1, &texID);
+////  glBindTexture (GL_TEXTURE_RECTANGLE_EXT, texID);
+////
+////  glTexImage2D (GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, pba);
+////  glBegin (GL_QUADS);
+////
+////  glTexCoord2f (0, 0);
+////  glVertex2f (0, 0);
+////
+////  glTexCoord2f (w, 0);
+////  glVertex2f (width(), 0);
+////
+////  glTexCoord2f (w, h);
+////  glVertex2f (width(), height());
+////
+////  glTexCoord2f (0, h);
+////  glVertex2f (0, width());
+//  pba = linker->get_pixmap(pba);
+//
+////  glRasterPos2d(x, y);
+////  glRasterPos2d(0,0);
+//  GLint iViewport[4];
+//  glGetIntegerv(GL_VIEWPORT, iViewport);
+//  glPixelZoom(iViewport[2]/w, iViewport[3]/h);
+//  glDrawPixels(w, h, GL_RGB, GL_FLOAT, pba);
+//
+//  glEnd();
+//}

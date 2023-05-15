@@ -8,7 +8,10 @@
 #include "ray.h"
 #include "vec3.h"
 
+class material;
+
 struct hit_record {
+ public:
   // point of intersection
   point3 p;
   // normal in the intersection
@@ -17,6 +20,8 @@ struct hit_record {
   double t;
   // is it facing front
   bool front_face;
+  //material on the way
+  std::shared_ptr<material> mat_ptr;
   // set if normal is front or outwards
   inline void set_face_normal(const ray& r, const vec3& outward_normal) {
     front_face = dot(r.direction(), outward_normal) < 0;

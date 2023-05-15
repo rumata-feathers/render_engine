@@ -25,15 +25,14 @@
 #include <QPainter>
 #include <QtOpenGLWidgets/QtOpenGLWidgets>
 #include <QtGui>
-//#include <QtOpenGL>
+#include <QtOpenGL>
 #include <QOpenGLFunctions>
 //#include <QOpenGLWindow>
-//#include <QtOpenGLVersion>
+#include <QtOpenGLVersion>
+#include <QtOpenGLWidgets/QtOpenGLWidgetsVersion>
 #include <QtOpenGLWidgets/QtOpenGLWidgetsDepends>
 #include <QtOpenGLWidgets/QOpenGLWidget>
-
-#include <QtQuick/QtQuick>
-#include <QtQuick/QQuickWindow>
+#include <QtOpenGLWidgets/QtOpenGLWidgets>
 
 
 #include "../resources.h"

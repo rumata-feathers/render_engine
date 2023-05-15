@@ -10,4 +10,5 @@ point3 ray::origin() const {
 point3 ray::at(double t) const {
   return orig + t*dir;
 }
+ray::ray() = default;
 ray::~ray() = default;
