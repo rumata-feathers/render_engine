@@ -18,7 +18,7 @@ class logic {
   std::pair<int, int> get_camera_rect();
   ~logic();
 
- private:
+ public:
   Scene* cur_scene;
   hittable_list world;
 };

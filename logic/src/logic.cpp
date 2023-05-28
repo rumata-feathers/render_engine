@@ -20,8 +20,8 @@ QColor q_color(const vec3& col) {
   return color_;
 }
 
-logic::logic(): cur_scene(new Scene) {
-  cur_scene->camera_ = camera(point3(-2,2,1), point3(0,0,-1), vec3(0,1,0), 90, 16.0/9.0);
+logic::logic() : cur_scene(new Scene) {
+  cur_scene->camera_ = camera(point3(-2, 2, 1), point3(0, 0, -1), vec3(0, 1, 0), 20, 16.0 / 9.0);
 //  cur_scene->camera_.set_pos(point3(0.0, 1.0, 0.0));
   auto material_ground = std::make_shared<BSDF>(color(0.8, 0.8, 0.0), 1, 0);
   auto material_center = std::make_shared<BSDF>(color(0.1, 0.2, 0.5), 0.7f, 0.3f);
@@ -53,7 +53,7 @@ color ray_color(const ray& r, const hittable& world, int depth) {
   }
 
   auto t = 0.5 * (unit_vector(r.direction()).y() + 1.0);
-  return (1.0 - t) * color(1.0, 1.0, 1.0) +t * color(0.5, 0.7, 1.0);
+  return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
 int get_pixel_pos(int x, int y, int width, int height, int depth = 3) {
   return ((height - y) * width + x) * depth;
@@ -71,7 +71,7 @@ QImage* logic::get_pixmap(QImage* pix_map, int sample, std::pair<int, int> start
   int cell_w = end.first - start.first;
   int cell_h = end.second - start.second;
 //  int max_threads = (int) std::thread::hardware_concurrency();
-  int max_threads = 1;
+  int max_threads = 4;
   // how much to give for the thread
   int thread_cell_w = std::floor((double) cell_w / (double) max_threads);
   int thread_cell_h = std::floor((double) cell_h / (double) max_threads);
@@ -146,8 +146,8 @@ float* logic::get_pixmap(float* pix_map, int sample, std::pair<int, int> start,
   bool complete = false;
   int cell_w = end.first - start.first;
   int cell_h = end.second - start.second;
-  int max_threads = (int) std::thread::hardware_concurrency();
-//  int max_threads = 8;
+//  int max_threads = (int) std::thread::hardware_concurrency();
+  int max_threads = 2;
   // how much to give for the thread
   int thread_cell_w = std::floor((double) cell_w / (double) max_threads);
   int thread_cell_h = std::floor((double) cell_h / (double) max_threads);

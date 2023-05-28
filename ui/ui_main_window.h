@@ -128,14 +128,14 @@ class Ui_MainWindow {
 
   void retranslateUi(QMainWindow* MainWindow) {
     MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "Rumat", nullptr));
-    actionRender->setText(QCoreApplication::translate("MainWindow", "Render", nullptr));
+    actionRender->setText(QCoreApplication::translate("MainWindow", "Render Image", nullptr));
     actionSave->setText(QCoreApplication::translate("MainWindow", "Save Rendered Image", nullptr));
 #if QT_CONFIG(whatsthis)
     graphicsView->setWhatsThis(QCoreApplication::translate("MainWindow",
                                                            "<html><head/><body><p>graphics_view</p><p><br/></p></body></html>",
                                                            nullptr));
 #endif // QT_CONFIG(whatsthis)
-    menuRender->setTitle(QCoreApplication::translate("MainWindow", "Render image", nullptr));
+    menuRender->setTitle(QCoreApplication::translate("MainWindow", "Render", nullptr));
   } // retranslateUi
 
 };
@@ -173,11 +173,11 @@ class Ui_RenderWindow {
   }
   void retranslateUi(QWidget* window) {
     window->setWindowTitle(QCoreApplication::translate("RenderWindow", "Render", nullptr));
-    actionSaveImage->setText(QCoreApplication::translate("RenderWindow", "Render", nullptr));
+    actionSaveImage->setText(QCoreApplication::translate("RenderWindow", "save", nullptr));
 //#if QT_CONFIG(whatsthis)
 //    graphicsView->setWhatsThis(QCoreApplication::translate("MainWindow", "<html><head/><body><p>graphics_view</p><p><br/></p></body></html>", nullptr));
 //#endif // QT_CONFIG(whatsthis)
-    menuSaveImage->setTitle(QCoreApplication::translate("RenderWindow", "Render", nullptr));
+    menuSaveImage->setTitle(QCoreApplication::translate("RenderWindow", "image", nullptr));
   } // retranslateUi
 };
 

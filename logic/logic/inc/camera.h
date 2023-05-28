@@ -88,7 +88,7 @@ class camera {
   vec3 rotation = point3(0.0, 0.0, 0.0);
   point3 llc;
   float aspect_ratio = 16.0 / 9.0;
-  int img_width = 120;
+  int img_width = 480;
   int img_height;
 
   vec3 horizontal;

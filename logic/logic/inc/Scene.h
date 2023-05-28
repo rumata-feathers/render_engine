@@ -17,7 +17,7 @@ class Scene {
   Scene(const camera& cam): camera_(cam) {}
   ~Scene();
 
-  int rend_samples = 30;
+  int rend_samples = 2;
   int max_depth = 10;
 
   camera camera_;

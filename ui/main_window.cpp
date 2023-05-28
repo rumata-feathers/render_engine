@@ -62,13 +62,42 @@ void MainWindow::on_actionRender_triggered() {
   render_window_->move(this->pos().operator+=(QPoint(offset_x, offset_y)));
   render_window_->show();
 }
-void MainWindow::on_actionSave_triggered() {
+void MainWindow::on_actionSave_triggered(int i) {
+  on_actionRender_triggered();
+
+
+  render_window_->render_animation();
+  return;
+
+  if (90 - i <= 5)
+    return;
+
   if (!render_window_){
+    moveToThread(this->thread());
     on_actionRender_triggered();
-    render_window_->render();
+//    QFuture<void> future = QtConcurrent::run([=]{render_window_->render();});
+//    future.waitForFinished();
+    on_actionSave_triggered(i);
   }
-//  render_window_->thread().
-  render_window_->pixmap->save("smth.png", "PNG", -1);
+
+  for (int j = 0; j < render_window_->threads.size(); ++j) {
+    if (!render_window_->threads[j])
+      continue;
+
+    int* x = new int(1000);
+    wait(x);
+    QtConcurrent::run([&, i]{on_actionSave_triggered(i);});
+    return;
+  }
+
+  std::string fileName = "/Users/georgiikuznetsov/Desktop/seq/file_" + std::to_string(i) + ".png";
+  if (render_window_->pixmap->save(QString::fromStdString(fileName), "PNG", -1)){
+    std::cout << "file saved!\n";
+    logic_linker->cur_scene->camera_ = camera(point3(-2,2,1), point3(0,0,-1), vec3(0,1,0), 90-i, 16.0/9.0);
+    QtConcurrent::run([=]{render_window_->render();});
+    on_actionSave_triggered(++i);
+  }else
+    std::cout << "file not saved!\n";
 //  render_window_->deleteLater();
 }
 void something(QImage* pix_map) {
@@ -88,7 +117,7 @@ void something(QImage* pix_map) {
   }
 }
 
-RenderWindow::RenderWindow(logic* new_logic, QWidget* parent) : logic_linker(new_logic), QWidget(parent), ui(new Render_Ui::RenderWindow) {
+/*RenderWindow::RenderWindow(logic* new_logic, QWidget* parent) : logic_linker(new_logic), QWidget(parent), ui(new Render_Ui::RenderWindow) {
 
   timer = new QTimer(this);
   scene = new QGraphicsScene(this);
@@ -121,6 +150,7 @@ RenderWindow::RenderWindow(logic* new_logic, QWidget* parent) : logic_linker(new
   connect(timer, &QTimer::timeout, this, [&]() {
     render();
   });
+
 //  connect(timer, &QObject::destroyed, this, [&]() { qDebug() << "timer_delete"; });
   timer->start();
 }
@@ -152,76 +182,70 @@ RenderWindow::~RenderWindow() {
   delete samples_lable;
 
 }
-void RenderWindow::draw(std::pair<int, QTimer>* q_thread, std::pair<int, int> start, std::pair<int, int> end)  {
-//  std::cerr << "render_window from " << start << " to " << end << " draw sample " << q_thread->first << '\t';
-//  std::cerr << q_thread->second.thread()->currentThreadId() << ' ' << q_thread->second.thread()->isRunning() << ' '
-//            << q_thread->second.isActive() << ' '
+void RenderWindow::draw(int* sample, QTimer* q_timer, std::pair<int, int> start, std::pair<int, int> end)  {
+//  std::cerr << "render_window from " << start << " to " << end << " draw sample " << sample << '\t';
+//  std::cerr << q_timer->thread()->currentThreadId() << ' ' << q_timer->thread()->isRunning() << ' '
+//            << q_timer->isActive() << ' '
 //            << current_threads << '\n';
-  if (q_thread->first > logic_linker->get_samples()) {
-    q_thread->second.stop();
+  if (*sample > logic_linker->get_samples()) {
+    q_timer->stop();
+//    q_thread->second.deleteLater();
     --current_threads;
-    delete q_thread;
+    delete sample;
+//    delete q_timer;
     return;
   }
 
   try {
-    pixmap = logic_linker->get_pixmap(pixmap, q_thread->first, start, end);
-    set_lable(q_thread->first);
-    ++(q_thread->first);
+    pixmap = logic_linker->get_pixmap(pixmap, *sample, start, end);
+    set_lable(*sample);
+    ++(*sample);
   } catch (...) {
     std::cout << "exception from draw->get_pixmap()\n";
   }
-//  scene->update(start.first, start.second, end.first - start.first, end.second - start.second);
   scene->addPixmap(QPixmap::fromImage(*pixmap));
+//  scene->update(start.first, start.second, end.first - start.first, end.second - start.second);
   this->update();
 //  std::cerr << "finish render\n";
 }
+void RenderWindow::render() {
+  std::cout << "start rendering " << *current_frame <<  ' ' << current_threads << "\n";
+  bool render_anim = false;
+  if(render_anim){
+    if (threads.empty()){
+      auto* p = new int;
+      auto* p_timer = new QTimer;
+      threads.push_back(p_timer);
+      p_timer->start();
 
-void manage_render(QTimer* render_timer, std::vector<std::pair<int, QTimer>*>* threads, int max_thread,
-                   int max_samples) {
-  int cur_threads = 0;
-  bool empty = true;
-  for (auto* th : *threads) {
-    if (th->first <= max_samples && th->first > 0)
-      ++cur_threads;
-    empty = false;
-  }
-//  std::cout << cur_threads << '\n';
-  if (empty) {
-    render_timer->stop();
-    delete render_timer;
-    threads->clear();
+      connect(p_timer, &QTimer::timeout, this, [&, p, p_timer, this]() {
+        draw(p, p_timer);
+        scene->update();
+      });
+      return;
+    }
+    for (int i =0; i < threads.size(); ++i) {
+      if (!threads[i] || !threads[i]->isActive()){
+        continue;
+      }
+      return;
+    }
+    for (int i = 0; i <threads.size(); ++i) {
+      threads[i]->deleteLater();
+    }
+    threads.clear();
+    std::cout << "finished rendering\n";
+    emit this->FinishedRendering();
     return;
   }
 
-//  for (auto& th : *threads) {
-//    std::cout << *(th->first) << ' ' << (th->second) << '\n';
-//  }
 
-//  if (cur_threads <= max_thread) {
-  for (auto* th : *threads) {
-//      if (th->first == 0) {
-    th->second.start();
-//        std::cout << &th->second << '\n';
-//        break;
-//      }
-  }
-//  }
-//  std::cout << "end\n";
-}
 
-bool can_thread(std::vector<std::pair<int, QTimer>*>* threads, int max_samples, int max_threads) {
-  int threads_num = 0;
-  for (auto* th : *threads) {
-    std::cout << th->first << ' ' << &th->second << ' ' << th->second.isActive() << '\n';
-    if (th->second.isActive())
-      ++threads_num;
-  }
 
-  return threads_num < max_threads;
-}
 
-void RenderWindow::render() {
+
+
+
   if (current_threads >= max_threads) {
     return;
   }
@@ -250,26 +274,58 @@ void RenderWindow::render() {
       int cell_width = (x + render_cell_width > logic_linker->get_camera_rect().first) ?
                        logic_linker->get_camera_rect().first - x : render_cell_width;
 
-      auto* p = new std::pair<int, QTimer>();
-      p->second.start();
+      auto* p = new int;
+      auto* p_timer = new QTimer;
+      threads.push_back(p_timer);
+      p_timer->start();
 
-//      QtConcurrent::run([&, x, y, cell_height, cell_width, p, this]{
-//        draw(p, {x, y}, {})
-//      });
-      connect(&p->second, &QTimer::timeout, this, [&, x, y, cell_height, cell_width, p, this]() {
-        draw(p, {x, y}, {x + cell_width, y + cell_height});
+      connect(p_timer, &QTimer::timeout, this, [&, x, y, cell_height, cell_width, p, p_timer, this]() {
+        draw(p, p_timer, {x, y}, {x + cell_width, y + cell_height});
         scene->update(QRect(x, y, cell_width, cell_height));
       });
       return;
     }
   }
-  QFile file("file_1.png");
-
-  if(pixmap->save(file.fileName(), 0, -1))
-    std::cout << "saved!\n";
-  else
-    std::cout << "failed!\n";
-  timer->stop();
+  for (int i =0; i < threads.size(); ++i) {
+//    std::cout << threads[i] << ' ' << threads[i]->isActive() << '\t';
+//    std::cout << &threads[i]->second << ' ' << threads[i]->second.isActive() << '\t';
+//    std::cout << threads[i]->second << '\n';
+    if (!threads[i] || !threads[i]->isActive()){
+//      delete threads[i];
+      continue;
+    }
+    return;
+  }
+  for (int i = 0; i <threads.size(); ++i) {
+    threads[i]->deleteLater();
+  }
+  threads.clear();
+  std::cout << "finished rendering\n";
+  emit this->FinishedRendering();
+//  timer->stop();
+}
+void RenderWindow::render_animation() {
+//  int cur_sample =
+  logic_linker->cur_scene->camera_ = camera(point3(-2,2,1), point3(0,0,-1), vec3(0,1,0), 90-*current_frame, 16.0/9.0);
+  end_frame = 89;
+  connect(this, SIGNAL(FinishedRendering()), this, SLOT(anim()));
+}
+void RenderWindow::anim() {
+  if (*current_frame >= end_frame){
+    timer->stop();
+    return;
+  }
+  std::string fileName = "/Users/georgiikuznetsov/Desktop/seq/file_" + std::to_string(*current_frame) + ".png";
+  if (pixmap->save(QString::fromStdString(fileName), "PNG", -1)){
+    std::cerr << "file saved!\n";
+    pixmap->fill(QColor(255, 255, 255));
+    ++(*current_frame);
+    current_threads = 0;
+    current_cell = 0;
+    logic_linker->cur_scene->camera_ = camera(point3(-2,2,1), point3(0,0,-1), vec3(0,1,0), 90-*current_frame, 16.0/9.0);
+  }else
+    std::cout << "file not saved!\n";
+  std::cout << "anim\n";
 }
 void RenderWindow::wheelEvent(QWheelEvent* event) {
   int angle = event->angleDelta().y();
@@ -285,6 +341,9 @@ void RenderWindow::set_lable(int sample) {
   std::string text = "samples: " + std::to_string(sample) + "/" + std::to_string(logic_linker->get_samples());
   samples_lable->setText(text.c_str());
 }
+void RenderWindow::on_actionSaveImage_triggered() {
+  std::cout << "qlksfmq\n";
+}*/
 
 //Render_Window::Render_Window(logic* linker, QWidget* parent) : linker(linker), ui(new Render_Ui::Render_Window) {
 //  ui->setupUi(this);
