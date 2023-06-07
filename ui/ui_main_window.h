@@ -12,7 +12,7 @@
 #include "main_window_par.h"
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
+#include <QtGui>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QHBoxLayout>
@@ -144,40 +144,45 @@ class Ui_RenderWindow {
   QAction* actionSaveImage;
   QMenuBar* menubar;
   QMenu* menuSaveImage;
+  QWidget* centralwidget;
  public:
-  void setupUi(QWidget* window) {
+  void setupUi(QOpenGLWindow* window) {
     if (window->objectName().isEmpty())
       window->setObjectName("Render");
-    window->setWindowModality(Qt::WindowModal);
-    window->setMouseTracking(true);
-    window->setAutoFillBackground(true);
+//    window->setWindowModality(Qt::WindowModal);
+//    window->setMouseTracking(true);
+//    window->setAutoFillBackground(true);
 
     actionSaveImage = new QAction(window);
     actionSaveImage->setObjectName("save rendered image");
     actionSaveImage->setCheckable(false);
-//    return;
-    menubar = new QMenuBar(window);
-    menubar->setObjectName("menubar");
-    menubar->setGeometry(QRect(0, 0, MAIN_WINDOW_WIDTH, MENUBAR_HEIGHT));
-    menuSaveImage = new QMenu(menubar);
-    menuSaveImage->setObjectName("menuSaveImage");
-    menubar->addMenu(menuSaveImage);
-    window->layout()->setMenuBar(menubar);
 
-    menubar->addAction(menuSaveImage->menuAction());
-    menuSaveImage->addAction(actionSaveImage);
+
+//    centralwidget = QWidget::createWindowContainer(window);
+//    QWidget::createWindowContainer(window, centralwidget);
+//    centralwidget->setObjectName("centralwidget");
+//    centralwidget->setMinimumSize(QSize(MAIN_WINDOW_MIN_WIDTH, MAIN_WINDOW_MIN_HEIGHT));
+//    return;
+//    menubar = new QMenuBar(centralwidget);
+//    menubar->setObjectName("menubar");
+//    menubar->setGeometry(QRect(0, 0, MAIN_WINDOW_WIDTH, MENUBAR_HEIGHT));
+//    menuSaveImage = new QMenu(menubar);
+//    menuSaveImage->setObjectName("menuSaveImage");
+//    menubar->addMenu(menuSaveImage);
+//    window->layout()->setMenuBar(menubar);
+
+//    menubar->addAction(menuSaveImage->menuAction());
+//    menuSaveImage->addAction(actionSaveImage);
 
     retranslateUi(window);
 
     QMetaObject::connectSlotsByName(window);
   }
-  void retranslateUi(QWidget* window) {
-    window->setWindowTitle(QCoreApplication::translate("RenderWindow", "Render", nullptr));
+  void retranslateUi(QOpenGLWindow* window) {
+    window->setTitle("Render");
+    //    window->setWindowTitle(QCoreApplication::translate("RenderWindow", "Render", nullptr));
     actionSaveImage->setText(QCoreApplication::translate("RenderWindow", "save", nullptr));
-//#if QT_CONFIG(whatsthis)
-//    graphicsView->setWhatsThis(QCoreApplication::translate("MainWindow", "<html><head/><body><p>graphics_view</p><p><br/></p></body></html>", nullptr));
-//#endif // QT_CONFIG(whatsthis)
-    menuSaveImage->setTitle(QCoreApplication::translate("RenderWindow", "image", nullptr));
+//    menuSaveImage->setTitle(QCoreApplication::translate("RenderWindow", "image", nullptr));
   } // retranslateUi
 };
 
@@ -186,7 +191,7 @@ class MainWindow : public Ui_MainWindow {};
 } // namespace Ui
 
 namespace Render_Ui {
-class RenderWindow : public Ui_RenderWindow {};
+class Render_Window : public Ui_RenderWindow {};
 } //namespace Ui
 
 QT_END_NAMESPACE

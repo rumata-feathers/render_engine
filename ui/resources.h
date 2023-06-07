@@ -23,16 +23,11 @@
 #include <QWheelEvent>
 #include <QToolBar>
 #include <QPainter>
-#include <QtOpenGLWidgets/QtOpenGLWidgets>
 #include <QtGui>
 #include <QtOpenGL>
 #include <QOpenGLFunctions>
 //#include <QOpenGLWindow>
 #include <QtOpenGLVersion>
-#include <QtOpenGLWidgets/QtOpenGLWidgetsVersion>
-#include <QtOpenGLWidgets/QtOpenGLWidgetsDepends>
-#include <QtOpenGLWidgets/QOpenGLWidget>
-#include <QtOpenGLWidgets/QtOpenGLWidgets>
 
 
 #include "../resources.h"

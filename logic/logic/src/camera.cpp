@@ -90,9 +90,14 @@ void camera::set_img_h(int other) {
   img_height = other;
 }
 ray camera::get_ray(double s, double t) const {
-  return {position, llc + s * horizontal + t * vertical - position};
+  vec3 rd = lens_radius * random_in_unit_disk();
+  vec3 offset = u * rd.x() + v * rd.y();
+
+  return {position + offset, llc + s * horizontal + t * vertical - position - offset,
+          random_double(time_start, time_end)};
 }
 camera::camera(double vfov, double aspect_ratio) {
+  img_height = static_cast<int>((float) img_width / aspect_ratio);
   auto theta = degrees_to_radians(vfov);
   auto h = tan(theta / 2);
   auto viewport_height = 2 * h;
@@ -109,10 +114,9 @@ camera::camera(const point3& lookfrom, const point3& lookat, const vec3& vup, do
   auto viewport_height = 2.0 * h;
   auto viewport_width = aspect_ratio * viewport_height;
 
-  auto w = unit_vector(lookfrom - lookat);
-  auto u = unit_vector(cross(vup, w));
-  auto v = cross(w, u);
-
+  w = unit_vector(lookfrom - lookat);
+  u = unit_vector(cross(vup, w));
+  v = cross(w, u);
 
   img_height = static_cast<int>((float) img_width / aspect_ratio);
 
@@ -120,5 +124,35 @@ camera::camera(const point3& lookfrom, const point3& lookat, const vec3& vup, do
   horizontal = viewport_width * u;
   vertical = viewport_height * v;
   llc = position - horizontal / 2 - vertical / 2 - w;
+}
+camera::camera(
+    const point3& lookfrom,
+    const point3& lookat,
+    const vec3& vup,
+    double vfov, // vertical field-of-view in degrees
+    double aspect_ratio,
+    double aperture,
+    double focus_dist,
+    double tm_start,
+    double tm_end
+              ) : time_start(tm_start), time_end(tm_end) {
+  auto theta = degrees_to_radians(vfov);
+  auto h = tan(theta / 2);
+  auto viewport_height = 2.0 * h;
+  auto viewport_width = aspect_ratio * viewport_height;
+
+  img_height = static_cast<int>((float) img_width / aspect_ratio);
+
+  w = unit_vector(lookfrom - lookat);
+  u = unit_vector(cross(vup, w));
+  v = cross(w, u);
+
+  position = lookfrom;
+  horizontal = focus_dist * viewport_width * u;
+  vertical = focus_dist * viewport_height * v;
+  llc = position - horizontal / 2 - vertical / 2 - focus_dist * w;
+
+  lens_radius = aperture / 2;
+
 }
 camera::~camera() = default;

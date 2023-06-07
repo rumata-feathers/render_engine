@@ -7,12 +7,13 @@
 
 #include "hittable.h"
 #include "vec3.h"
+#include "material.h"
 
 class triangle : public hittable {
  public:
   triangle();
 
-  triangle(const point3& v0, const point3& v1, const point3& v2);
+  triangle(const point3& v0, const point3& v1, const point3& v2, std::shared_ptr<material> m);
 
   virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
 
@@ -22,6 +23,8 @@ class triangle : public hittable {
   point3 v0;
   point3 v1;
   point3 v2;
+
+  std::shared_ptr<material> mat_ptr;
 };
 
 #endif //ENGINE_LOGIC_LOGIC_INC_TRIANGLE_H_

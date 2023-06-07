@@ -7,6 +7,10 @@
 
 #include <string>
 #include "camera.h"
+#include "resources.h"
+#include "hittable_list.h"
+#include "sphere.h"
+#include "moving_sphere.h"
 
 class Scene {
  public:
@@ -14,11 +18,12 @@ class Scene {
   camera get_camera() const;
 
   Scene();
-  Scene(const camera& cam): camera_(cam) {}
+  Scene(const camera& cam) : camera_(cam) {}
+  void set_camera(const camera& cam) { camera_ = cam; }
   ~Scene();
 
-  int rend_samples = 2;
-  int max_depth = 10;
+  int rend_samples = 3;
+  int max_depth = 5;
 
   camera camera_;
  private:
@@ -29,5 +34,8 @@ class Scene {
   int sample_x = 32;
   int sample_y = 32;
 };
+
+hittable_list random_scene();
+
 
 #endif //ENGINE_LOGIC_SCENES_SRC_SCENE_H_

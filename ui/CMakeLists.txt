@@ -46,7 +46,7 @@ endif ()
 set(QT_LIBRARIES Qt${QT_VERSION_MAJOR}::Widgets CACHE INTERNAL "")
 
 target_link_libraries(engine PUBLIC Qt${QT_VERSION_MAJOR}::Widgets)
-target_link_libraries(engine PUBLIC Qt6::OpenGL ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
+target_link_libraries(engine PUBLIC Qt${QT_VERSION_MAJOR}::OpenGL ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
 
 set_target_properties(engine PROPERTIES
         MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

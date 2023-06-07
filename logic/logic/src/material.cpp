@@ -50,7 +50,7 @@ bool BSDF::scatter(const ray& r_in, const hit_record& rec, color& attenuation, r
   // sum everything up;
   auto new_ray = reflected_direction * metallic + diffuse_direction * diffuse + glass_direction * glossiness;
   new_ray = unit_vector(new_ray);
-  scattered = ray(rec.p, new_ray);
+  scattered = ray(rec.p, new_ray, r_in.get_time());
   //compute color
   auto color_coef = unit_coef(diffuse, glossiness, metallic);
   attenuation = albedo * diffuse * color_coef + glass_colour * glossiness * color_coef + albedo * metallic * color_coef;

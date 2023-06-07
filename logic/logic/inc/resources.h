@@ -38,6 +38,7 @@ inline double clamp(double x, double min, double max) {
 // includes
 #include "ray.h"
 #include "vec3.h"
+#include "material.h"
 //#include "sphere.h"
 //#include "triangle.h"
 //#include "hittable_list.h"

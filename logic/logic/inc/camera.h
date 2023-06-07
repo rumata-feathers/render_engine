@@ -17,17 +17,18 @@ class camera {
          const vec3& vup,
          double vfov, // vertical field-of-view in degrees
          double aspect_ratio);
-  camera(const camera& other) {
-    position = other.position;
-    horizontal = other.horizontal;
-    vertical = other.vertical;
-    llc = other.llc;
-    aspect_ratio = other.aspect_ratio;
-    img_width = other.img_width;
-    img_height = other.img_height;
-
-    focal_length = other.focal_length;
-  }
+  camera(const camera& other) = default;
+  camera(
+      const point3& lookfrom,
+      const point3& lookat,
+      const vec3& vup,
+      double vfov, // vertical field-of-view in degrees
+      double aspect_ratio,
+      double aperture,
+      double focus_dist,
+      double tm_start = 0.0,
+      double tm_end = 0.0
+        );
   // get camera position
   [[nodiscard]]
   point3 pos() const;
@@ -68,18 +69,7 @@ class camera {
 
   ray get_ray(double, double) const;
 
-  camera& operator=(const camera& other){
-    position = other.position;
-    horizontal = other.horizontal;
-    vertical = other.vertical;
-    llc = other.llc;
-    aspect_ratio = other.aspect_ratio;
-    img_width = other.img_width;
-    img_height = other.img_height;
-
-    focal_length = other.focal_length;
-    return *this;
-  }
+  camera& operator=(const camera& other) = default;
 
   ~camera();
 
@@ -88,12 +78,19 @@ class camera {
   vec3 rotation = point3(0.0, 0.0, 0.0);
   point3 llc;
   float aspect_ratio = 16.0 / 9.0;
-  int img_width = 480;
+  int img_width = 80;
   int img_height;
 
   vec3 horizontal;
   vec3 vertical;
   float focal_length = 1.0;
+
+  double time_start = 0.0;
+  double time_end = 0.0;
+
+  //TODO
+  vec3 u, v, w;
+  double lens_radius;
 };
 
 #endif //ENGINE_LOGIC_LOGIC_INC_CAMERA_H_

@@ -18,7 +18,7 @@ QT_BEGIN_NAMESPACE
 namespace Render_Ui { class Render_Window;  }
 QT_END_NAMESPACE
 
-class RenderWindow;
+class Render_Window;
 
 class MainWindow : public QMainWindow, protected QOpenGLFunctions {
  Q_OBJECT
@@ -39,7 +39,7 @@ class MainWindow : public QMainWindow, protected QOpenGLFunctions {
 
  private:
   Ui::MainWindow* ui;
-  RenderWindow* render_window_ = nullptr;
+  Render_Window* render_window_ = nullptr;
 
   QGraphicsScene* scene;
   QGraphicsPixmapItem* pixmap_item;
@@ -98,8 +98,10 @@ class MainWindow : public QMainWindow, protected QOpenGLFunctions {
 class Render_Window : public QOpenGLWindow, protected QOpenGLFunctions {
  Q_OBJECT
  public:
-  Render_Window(logic* linker, QWidget* parent = nullptr);
+  Render_Window(QWidget* parent = nullptr);
   ~Render_Window() override = default;
+
+  void set_linker(logic* linker);
 
  protected:
   void mousePressEvent(QMouseEvent* e) override;
@@ -108,9 +110,16 @@ class Render_Window : public QOpenGLWindow, protected QOpenGLFunctions {
 
   void initializeGL() override;
   void resizeGL(int w, int h) override;
+  void wheelEvent(QWheelEvent*) override;
   void paintGL() override;
+  void render();
+  signals: void finished_render();
+//  void paintEvent(QPaintEvent* event) override;
  private:
-  logic* linker;
+  logic* linker = nullptr;
+  float* pba = nullptr;
+  int sample = 0;
+  QTimer* timer;
  private:
   Render_Ui::Render_Window* ui;
 };

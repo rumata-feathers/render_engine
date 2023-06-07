@@ -8,6 +8,8 @@
 #include "resources.h"
 #include "../logic/inc/resources.h"
 #include "../logic/inc/hittable_list.h"
+#include "../logic/inc/Scene.h"
+#include "../logic/inc/triangle.h"
 
 class logic {
  public:
@@ -22,4 +24,6 @@ class logic {
   Scene* cur_scene;
   hittable_list world;
 };
+
+bool object_reader(hittable_list& world, char const* fileName);
 #endif //ENGINE_LOGIC_SRC_LOGIC_H_
