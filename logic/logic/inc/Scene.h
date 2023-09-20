@@ -11,6 +11,11 @@ class Scene {
  public:
   Scene();
   ~Scene();
+<<<<<<< Updated upstream
+=======
+
+  camera camera_;
+>>>>>>> Stashed changes
  private:
   std::string name;
   std::string location;
