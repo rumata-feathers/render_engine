@@ -39,10 +39,6 @@ Feel free to fork the repository and submit pull requests.
 
 This project is licensed under the MIT License.
 
-## Contact
-
-For any questions, please contact the repository owner.
-
 
 
 ![file_64](https://github.com/user-attachments/assets/accdda9f-7145-4cc3-8ebf-753678b1de33)
